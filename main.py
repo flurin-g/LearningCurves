@@ -38,13 +38,16 @@ HyperParameters = namedtuple('HyperParameters',
                               'which_dataset'])
 
 
-def setup_experiments() -> Tuple[list, list]:
+def setup_experiments(h_params: HyperParameters) -> Tuple[list, list]:
     params_naive_bayes = {}  # naive Bayes is parameter-free
     tune_naive_bayes = []
 
     params_knn = {'algorithm': 'ball_tree', 'n_neighbors': 2, 'weights': 'distance'}
-    tune_knn = {'n_neighbors': [1, 4, 8, 16, 32, 64, 96, 128]}
-    # tune_knn =   {'n_neighbors': [1,2,3,4,5,6,7,8]}
+
+    if h_params.which_dataset == 1 and h_params.which_classifier == 1:
+        tune_knn = {'n_neighbors': [1, 2, 3, 4, 5, 6, 7, 8]}
+    else:
+        tune_knn = {'n_neighbors': [1, 4, 8, 16, 32, 64, 96, 128]}
 
     params_svm_linear = {'kernel': 'linear', 'C': 1}
     tune_svm_linear = {'C': [1E-5, 1E-4, 1E-3, 0.01, 0.1, 1, 10, 100]}
@@ -229,7 +232,7 @@ def train_classifier(estimators: List[dict], X: np.ndarray, y: np.ndarray, h_par
 
 
 def run_experiment(h_params: HyperParameters):
-    estimators, datasets = setup_experiments()
+    estimators, datasets = setup_experiments(h_params)
     X, y, name = load_data(datasets, h_params.which_dataset)
     print_dataset_info(name, X)
 
